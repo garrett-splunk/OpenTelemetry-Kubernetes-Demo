@@ -284,21 +284,20 @@ helm repo update</code></pre>
         <p>Deploy the application with Observability Cloud as an exporter using the <code>splunk-values.yaml</code> file and Helm <code>--set-string</code> overrides.</p>
 
         <div class="callout callout--warning">
-          <p class="callout__title">Change lab.owner to your name</p>
+          <p class="callout__title">Set lab.owner to your name</p>
           <div class="callout__body">
-            <p>Replace <code>JayDavis</code> in the install command with <strong>your name with no spaces</strong>. This is how you will find your application in Observability Cloud.</p>
+            <p>Replace <code>&lt;insert your name&gt;</code> in the install command with <strong>your name with no spaces</strong>. This is how you will find your application in Observability Cloud.</p>
           </div>
         </div>
 
-        <h3>4.1 — Create startcommand.sh</h3>
-        <p>Create a scratch file and paste the Helm install command below.</p>
+        <h3>4.1 — Run helm install</h3>
+        <p>From the <code>opentelemetry-demo</code> directory, run:</p>
         <div class="code-block">
           <div class="code-block__header">
-            <span class="code-block__file">startcommand.sh</span>
+            <span class="code-block__file">terminal</span>
             <button type="button" class="btn-copy" data-copy="cmd-install">Copy</button>
           </div>
-          <pre><code id="cmd-install">#!/bin/bash
-helm install otel-demo open-telemetry/opentelemetry-demo \
+          <pre><code id="cmd-install">helm install otel-demo open-telemetry/opentelemetry-demo \
   -n otel-demo --create-namespace \
   -f splunk-values.yaml \
   --set-string "opentelemetry-collector.config.exporters.otlphttp/signalfx.traces_endpoint=https://ingest.${REALM}.signalfx.com/v2/trace/otlp" \
@@ -308,17 +307,7 @@ helm install otel-demo open-telemetry/opentelemetry-demo \
   --set-string "opentelemetry-collector.config.processors.resource/lab.attributes[0].value=${INSTANCE}" \
   --set-string "opentelemetry-collector.config.processors.resource/lab.attributes[2].value=${INSTANCE}-cluster" \
   --set-string "opentelemetry-collector.config.processors.resource/lab.attributes[3].value=workshop-${INSTANCE}" \
-  --set-string "opentelemetry-collector.config.processors.resource/lab.attributes[1].value=JayDavis"</code></pre>
-        </div>
-
-        <h3>4.2 — Run the install</h3>
-        <div class="code-block">
-          <div class="code-block__header">
-            <span class="code-block__file">terminal</span>
-            <button type="button" class="btn-copy" data-copy="cmd-run-install">Copy</button>
-          </div>
-          <pre><code id="cmd-run-install">chmod +x startcommand.sh
-./startcommand.sh</code></pre>
+  --set-string "opentelemetry-collector.config.processors.resource/lab.attributes[1].value=&lt;insert your name&gt;"</code></pre>
         </div>
 
         <p><strong>Expected output:</strong></p>
@@ -421,7 +410,7 @@ otel-collector-agent-28667         1/1     Running   0          111s
           <thead><tr><th>Filter</th><th>Example</th><th>Finds</th></tr></thead>
           <tbody>
             <tr><td><code>lab.id</code></td><td><code>shw-45fb</code></td><td>All signals from your workshop instance</td></tr>
-            <tr><td><code>lab.owner</code></td><td><code>JayDavis</code></td><td>Data tagged with your name at install</td></tr>
+            <tr><td><code>lab.owner</code></td><td><code>&lt;insert your name&gt;</code></td><td>Data tagged with your name at install</td></tr>
             <tr><td><code>deployment.environment</code></td><td><code>workshop-shw-45fb</code></td><td>APM environment for this lab</td></tr>
           </tbody>
         </table>
@@ -449,7 +438,7 @@ otel-collector-agent-28667         1/1     Running   0          111s
   --set-string "opentelemetry-collector.config.processors.resource/lab.attributes[0].value=${INSTANCE}" \
   --set-string "opentelemetry-collector.config.processors.resource/lab.attributes[2].value=${INSTANCE}-cluster" \
   --set-string "opentelemetry-collector.config.processors.resource/lab.attributes[3].value=workshop-${INSTANCE}" \
-  --set-string "opentelemetry-collector.config.processors.resource/lab.attributes[1].value=JayDavis"</code></pre>
+  --set-string "opentelemetry-collector.config.processors.resource/lab.attributes[1].value=&lt;insert your name&gt;"</code></pre>
         </div>
 
         <p>Then delete the collector pods so they restart with your new settings:</p>
