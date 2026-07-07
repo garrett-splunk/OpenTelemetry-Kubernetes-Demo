@@ -948,6 +948,20 @@ body {
   font-size: 0.85em;
 }
 
+/* Full-width UI walkthrough screenshots (Step 7) */
+.screenshot--full {
+  width: min(100%, 640px);
+  max-width: 640px;
+}
+
+.screenshot--full .screenshot__img {
+  width: 100%;
+  max-width: 100%;
+  max-height: none;
+  object-fit: contain;
+  object-position: center top;
+}
+
 @media (max-width: 768px) {
   .screenshot {
     width: min(88%, 100%);

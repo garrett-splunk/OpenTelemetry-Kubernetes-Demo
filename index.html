@@ -140,9 +140,9 @@
         <p><strong>Expected output:</strong></p>
         <div class="code-block success-line">
           <pre><code>NAME                            STATUS   ROLES                  AGE   VERSION
-k3d-shw-45fb-cluster-agent-0    Ready    &lt;none&gt;                 5d    v1.33.4+k3s1
-k3d-shw-45fb-cluster-agent-1    Ready    &lt;none&gt;                 5d    v1.33.4+k3s1
-k3d-shw-45fb-cluster-server-0   Ready    control-plane,master   5d    v1.33.4+k3s1</code></pre>
+k3d-shw-455e-cluster-agent-0    Ready    &lt;none&gt;                 5d    v1.33.4+k3s1
+k3d-shw-455e-cluster-agent-1    Ready    &lt;none&gt;                 5d    v1.33.4+k3s1
+k3d-shw-455e-cluster-server-0   Ready    control-plane,master   5d    v1.33.4+k3s1</code></pre>
         </div>
         <p>This is the cluster agent that is installed to monitor Workshop systems.</p>
 
@@ -156,7 +156,7 @@ k3d-shw-45fb-cluster-server-0   Ready    control-plane,master   5d    v1.33.4+k3
         </div>
         <p><strong>Expected output:</strong></p>
         <div class="code-block success-line">
-          <pre><code>shw-45fb</code></pre>
+          <pre><code>shw-455e</code></pre>
         </div>
         <p>This is unique to each Workshop host.</p>
       </section>
@@ -399,19 +399,50 @@ otel-collector-agent-28667         1/1     Running   0          111s
         <p>Use the resource attributes from Step 3 to filter to your lab data in Splunk Observability Cloud.</p>
 
         <article class="ui-walkthrough">
+          <h3>A. APM → Service Map → Filter</h3>
           <ol>
-            <li><strong>APM → Services</strong> → filter <code>lab.id:&lt;your-id&gt;</code></li>
-            <li><strong>Metric Finder</strong> → filter <code>lab.id:&lt;your-id&gt;</code></li>
-            <li><strong>Tag Spotlight</strong> → filter <code>lab.owner:&lt;your-name&gt;</code></li>
+            <li>Open <strong>APM</strong> → <strong>Service Map</strong></li>
+            <li>In the filter bar, add <code>lab.id:shw-455e</code> (use your <code>$INSTANCE</code> value)</li>
+            <li>Confirm your demo services appear on the map</li>
           </ol>
+          <figure class="screenshot screenshot--full">
+            <img src="screenshots/services.png" alt="APM Service Map filtered by lab.id" class="screenshot__img" loading="lazy" />
+            <figcaption class="screenshot__caption"><strong>Services</strong> — APM → Service Map with <code>lab.id</code> filter applied</figcaption>
+          </figure>
+        </article>
+
+        <article class="ui-walkthrough">
+          <h3>B. Metrics → Metric Explorer</h3>
+          <ol>
+            <li>Open <strong>Metrics</strong> → <strong>Metric Explorer</strong></li>
+            <li>Add filter <code>lab.id:shw-455e</code> (use your <code>$INSTANCE</code> value)</li>
+            <li>Browse metrics from your demo (e.g. span-derived or infrastructure metrics)</li>
+          </ol>
+          <figure class="screenshot screenshot--full">
+            <img src="screenshots/metrics.png" alt="Metric Explorer filtered by lab.id" class="screenshot__img" loading="lazy" />
+            <figcaption class="screenshot__caption"><strong>Metrics</strong> — Metrics → Metric Explorer with <code>lab.id</code> filter applied</figcaption>
+          </figure>
+        </article>
+
+        <article class="ui-walkthrough">
+          <h3>C. Tag Spotlight</h3>
+          <ol>
+            <li>On the <strong>Service Map</strong>, click one of your services</li>
+            <li>In the right-hand panel, open <strong>Tag Spotlight</strong></li>
+            <li>Review tags such as <code>lab.owner</code>, <code>lab.id</code>, and <code>deployment.environment</code></li>
+          </ol>
+          <figure class="screenshot screenshot--full">
+            <img src="screenshots/tag-spotlight.png" alt="Tag Spotlight panel for a selected service" class="screenshot__img" loading="lazy" />
+            <figcaption class="screenshot__caption"><strong>Tag Spotlight</strong> — Service Map → select a service → Tag Spotlight in the right panel</figcaption>
+          </figure>
         </article>
 
         <table class="info-table">
           <thead><tr><th>Filter</th><th>Example</th><th>Finds</th></tr></thead>
           <tbody>
-            <tr><td><code>lab.id</code></td><td><code>shw-45fb</code></td><td>All signals from your workshop instance</td></tr>
+            <tr><td><code>lab.id</code></td><td><code>shw-455e</code></td><td>All signals from your workshop instance</td></tr>
             <tr><td><code>lab.owner</code></td><td><code>&lt;insert your name&gt;</code></td><td>Data tagged with your name at install</td></tr>
-            <tr><td><code>deployment.environment</code></td><td><code>workshop-shw-45fb</code></td><td>APM environment for this lab</td></tr>
+            <tr><td><code>deployment.environment</code></td><td><code>workshop-shw-455e</code></td><td>APM environment for this lab</td></tr>
           </tbody>
         </table>
       </section>
