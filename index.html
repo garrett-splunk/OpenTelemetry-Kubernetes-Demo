@@ -402,12 +402,12 @@ otel-collector-agent-28667         1/1     Running   0          111s
           <h3>A. APM → Service Map → Filter</h3>
           <ol>
             <li>Open <strong>APM</strong> → <strong>Service Map</strong></li>
-            <li>In the filter bar, add <code>lab.id:shw-455e</code> (use your <code>$INSTANCE</code> value)</li>
+            <li>In the filter bar, add <code>environment:workshop-shw-455e</code> (use <code>workshop-${INSTANCE}</code> — your <code>$INSTANCE</code> or <code>lab.id</code> value)</li>
             <li>Confirm your demo services appear on the map</li>
           </ol>
           <figure class="screenshot screenshot--full">
-            <img src="screenshots/services.png" alt="APM Service Map filtered by lab.id" class="screenshot__img" loading="lazy" />
-            <figcaption class="screenshot__caption"><strong>Services</strong> — APM → Service Map with <code>lab.id</code> filter applied</figcaption>
+            <img src="screenshots/services.png" alt="APM Service Map filtered by environment" class="screenshot__img" loading="lazy" />
+            <figcaption class="screenshot__caption"><strong>Services</strong> — APM → Service Map with <code>environment:workshop-${INSTANCE}</code> filter applied</figcaption>
           </figure>
         </article>
 
