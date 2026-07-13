@@ -42,8 +42,9 @@
         <li class="sidebar-tree__item"><a href="#values" class="sidebar-tree__link" data-step="3"><span class="sidebar-tree__num">3</span> splunk-values.yaml</a></li>
         <li class="sidebar-tree__item"><a href="#install" class="sidebar-tree__link" data-step="4"><span class="sidebar-tree__num">4</span> Install</a></li>
         <li class="sidebar-tree__item"><a href="#verify" class="sidebar-tree__link" data-step="5"><span class="sidebar-tree__num">5</span> Watch / verify</a></li>
-        <li class="sidebar-tree__item"><a href="#access" class="sidebar-tree__link" data-step="6"><span class="sidebar-tree__num">6</span> Access the demo</a></li>
+        <li class="sidebar-tree__item"><a href="#access" class="sidebar-tree__link" data-step="6"><span class="sidebar-tree__num">6</span> Access (optional)</a></li>
         <li class="sidebar-tree__item"><a href="#o11y" class="sidebar-tree__link" data-step="7"><span class="sidebar-tree__num">7</span> Find data in O11y</a></li>
+        <li class="sidebar-tree__item"><a href="#wrapup" class="sidebar-tree__link" data-step="0"><span class="sidebar-tree__num">—</span> Wrap-up</a></li>
         <li class="sidebar-tree__item"><a href="#cleanup" class="sidebar-tree__link" data-step="8"><span class="sidebar-tree__num">8</span> Cleanup</a></li>
         <li class="sidebar-tree__item"><a href="#diagnostics" class="sidebar-tree__link" data-step="9"><span class="sidebar-tree__num">?</span> Diagnostics</a></li>
         <li class="sidebar-tree__item"><a href="#errors" class="sidebar-tree__link" data-step="11"><span class="sidebar-tree__num">?</span> Common errors</a></li>
@@ -366,25 +367,35 @@ otel-collector-agent-28667         1/1     Running   0          111s
       <section id="access">
         <div class="step-meta">
           <span class="step-badge">Step 6</span>
+          <span class="step-time">Optional</span>
         </div>
-        <h2>Access the demo</h2>
-        <p>All services are available via the frontend proxy on port <strong>8080</strong>. Replace <code>&lt;ec2-ip&gt;</code> with your workshop host IP.</p>
+        <h2>Access the demo (optional)</h2>
+        <p class="muted">Skip to <a href="#o11y">Step 7</a> if browser access is not available — the load generator runs inside the cluster, so telemetry still flows to Observability Cloud without visiting the web UI.</p>
+
+        <div class="callout callout--warning">
+          <p class="callout__title">Localhost often does not work</p>
+          <div class="callout__body">
+            <p>Port-forwarding to <code>localhost:8080</code> frequently fails in shared workshop environments (network restrictions, no browser on the host, or firewall rules). This step is <strong>optional</strong> — confirming data in Step 7 is the main success criteria.</p>
+          </div>
+        </div>
+
+        <p>If your instructor provides a reachable host IP, services are available via the frontend proxy on port <strong>8080</strong>:</p>
 
         <table class="info-table">
           <thead><tr><th>Path</th><th>Service</th></tr></thead>
           <tbody>
-            <tr><td><code>http://&lt;ec2-ip&gt;:8080/</code></td><td>Webstore</td></tr>
-            <tr><td><code>http://&lt;ec2-ip&gt;:8080/jaeger/ui/</code></td><td>Jaeger</td></tr>
-            <tr><td><code>http://&lt;ec2-ip&gt;:8080/grafana/</code></td><td>Grafana</td></tr>
-            <tr><td><code>http://&lt;ec2-ip&gt;:8080/loadgen/</code></td><td>Load Generator</td></tr>
-            <tr><td><code>http://&lt;ec2-ip&gt;:8080/feature/</code></td><td>Feature Flags</td></tr>
+            <tr><td><code>http://&lt;workshop-host&gt;:8080/</code></td><td>Webstore</td></tr>
+            <tr><td><code>http://&lt;workshop-host&gt;:8080/jaeger/ui/</code></td><td>Jaeger</td></tr>
+            <tr><td><code>http://&lt;workshop-host&gt;:8080/grafana/</code></td><td>Grafana</td></tr>
+            <tr><td><code>http://&lt;workshop-host&gt;:8080/loadgen/</code></td><td>Load Generator</td></tr>
+            <tr><td><code>http://&lt;workshop-host&gt;:8080/feature/</code></td><td>Feature Flags</td></tr>
           </tbody>
         </table>
 
         <div class="callout callout--tip">
-          <p class="callout__title">Port-forward alternative</p>
+          <p class="callout__title">Port-forward (if it works on your host)</p>
           <div class="callout__body">
-            <p>From the Helm output: <code>kubectl --namespace otel-demo port-forward svc/frontend-proxy 8080:8080</code> then browse <code>http://localhost:8080/</code>.</p>
+            <p><code>kubectl --namespace otel-demo port-forward svc/frontend-proxy 8080:8080</code> then browse <code>http://localhost:8080/</code>. If the connection fails, continue to Step 7.</p>
           </div>
         </div>
       </section>
@@ -395,7 +406,20 @@ otel-collector-agent-28667         1/1     Running   0          111s
           <span class="step-time">~5 min</span>
         </div>
         <h2>Find your data in O11y</h2>
-        <p>Use the resource attributes from Step 3 to filter to your lab data in Splunk Observability Cloud.</p>
+        <p>Use the resource attributes from Step 3 to filter to your lab data in Splunk Observability Cloud. This is the primary way to confirm the lab worked.</p>
+
+        <div class="callout callout--info">
+          <p class="callout__title">How data lands in the backend</p>
+          <div class="callout__body">
+            <p>Demo microservices send OTLP traces and metrics to the in-cluster <strong>OTel Collector</strong>. The collector’s <code>resource/lab</code> processor stamps every signal with dimensions like <code>lab.id</code>, <code>lab.owner</code>, and <code>deployment.environment</code> before export.</p>
+            <ul>
+              <li><strong>Traces</strong> → ingested via <code>otlphttp/signalfx</code> → stored in Splunk APM (service map, request traces, dependencies)</li>
+              <li><strong>Metrics</strong> → ingested via <code>signalfx</code> exporter → stored as MTS (metric time series) with the same dimensions attached</li>
+              <li><strong>Dimensions</strong> → become filterable tags in the UI (Service Map filters, Metric Explorer, Tag Spotlight)</li>
+            </ul>
+            <p class="muted">Because tags are applied at the collector, you can isolate <em>your</em> workshop data even though many participants share the same org.</p>
+          </div>
+        </div>
 
         <div class="callout callout--tip">
           <p class="callout__title">Need your instance ID?</p>
@@ -422,6 +446,12 @@ otel-collector-agent-28667         1/1     Running   0          111s
             <img src="screenshots/services.png" alt="APM Service Map filtered by environment" class="screenshot__img" loading="lazy" />
             <figcaption class="screenshot__caption"><strong>Services</strong> — APM → Service Map with <code>environment:workshop-${INSTANCE}</code> filter applied</figcaption>
           </figure>
+          <div class="callout callout--info">
+            <p class="callout__title">Why the Service Map matters</p>
+            <div class="callout__body">
+              <p>The Service Map is built from <strong>trace data</strong> — each arrow is a real call between services. It answers: <em>What is running? What talks to what? Where is latency or errors?</em> Filtering by <code>environment</code> scopes the map to your lab deployment so you only see the OTel demo services you installed.</p>
+            </div>
+          </div>
         </article>
 
         <article class="ui-walkthrough">
@@ -435,6 +465,12 @@ otel-collector-agent-28667         1/1     Running   0          111s
             <img src="screenshots/metrics.png" alt="Metric Explorer filtered by lab.id" class="screenshot__img" loading="lazy" />
             <figcaption class="screenshot__caption"><strong>Metrics</strong> — Metrics → Metric Explorer with <code>lab.id</code> filter applied</figcaption>
           </figure>
+          <div class="callout callout--info">
+            <p class="callout__title">Why Metric Explorer matters</p>
+            <div class="callout__body">
+              <p>Metrics are numeric time series (request rates, JVM stats, span-derived RED metrics, Kafka lag, etc.) stored as <strong>MTS</strong> in Observability Cloud. Metric Explorer lets you chart any metric and slice by dimensions like <code>lab.id</code>. Use it for dashboards, alerts, and capacity trends — complementary to the Service Map’s request-level view.</p>
+            </div>
+          </div>
         </article>
 
         <article class="ui-walkthrough">
@@ -448,6 +484,12 @@ otel-collector-agent-28667         1/1     Running   0          111s
             <img src="screenshots/tag-spotlight.png" alt="Tag Spotlight panel for a selected service" class="screenshot__img" loading="lazy" />
             <figcaption class="screenshot__caption"><strong>Tag Spotlight</strong> — Service Map → select a service → Tag Spotlight in the right panel</figcaption>
           </figure>
+          <div class="callout callout--info">
+            <p class="callout__title">Why Tag Spotlight matters</p>
+            <div class="callout__body">
+              <p>Tag Spotlight shows the <strong>dimensions</strong> (metadata tags) attached to a service’s telemetry — including the <code>lab.id</code>, <code>lab.owner</code>, and <code>deployment.environment</code> values you set in <code>splunk-values.yaml</code>. It confirms the collector’s <code>resource/lab</code> processor ran correctly and helps you understand which tags you can filter on in charts and APM views.</p>
+            </div>
+          </div>
         </article>
 
         <table class="info-table">
@@ -458,6 +500,48 @@ otel-collector-agent-28667         1/1     Running   0          111s
             <tr><td><code>deployment.environment</code></td><td><code>workshop-shw-455e</code></td><td>APM environment for this lab</td></tr>
           </tbody>
         </table>
+      </section>
+
+      <section id="wrapup">
+        <div class="step-meta">
+          <span class="step-badge">Wrap-up</span>
+        </div>
+        <h2>Great job — what you accomplished</h2>
+        <p>If you reached Step 7 and saw your services, metrics, and tags in Observability Cloud, you completed the core lab. Here is a quick recap of the concepts and outcomes.</p>
+
+        <div class="callout callout--tip">
+          <p class="callout__title">What we covered</p>
+          <div class="callout__body">
+            <ul>
+              <li><strong>Kubernetes + Helm</strong> — deployed the upstream OpenTelemetry Demo chart into an isolated <code>otel-demo</code> namespace</li>
+              <li><strong>OpenTelemetry Collector</strong> — configured receivers, processors, exporters, and pipelines in <code>splunk-values.yaml</code></li>
+              <li><strong>Resource attributes</strong> — tagged every trace and metric with <code>lab.id</code>, <code>lab.owner</code>, <code>k8s.cluster.name</code>, and <code>deployment.environment</code> via the <code>resource/lab</code> processor</li>
+              <li><strong>Splunk export</strong> — sent traces to APM (<code>otlphttp/signalfx</code>) and metrics to Observability Cloud (<code>signalfx</code> exporter)</li>
+              <li><strong>Observability UI</strong> — validated data in the Service Map, Metric Explorer, and Tag Spotlight using your workshop filters</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>What you achieved</h3>
+        <table class="info-table">
+          <thead><tr><th>Milestone</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>Demo running in k8s</td><td>All pods <code>Running</code> in Step 5</td></tr>
+            <tr><td>Collector exporting cleanly</td><td>No <code>401</code>/<code>404</code> errors in collector logs</td></tr>
+            <tr><td>Traces in APM</td><td>Your services visible on the Service Map (Step 7.A)</td></tr>
+            <tr><td>Metrics ingested</td><td><code>lab.id</code> metrics plotting in Metric Explorer (Step 7.B)</td></tr>
+            <tr><td>Tags applied correctly</td><td><code>lab.owner</code> and <code>deployment.environment</code> in Tag Spotlight (Step 7.C)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout--info">
+          <p class="callout__title">The big picture</p>
+          <div class="callout__body">
+            <p>You instrumented a multi-service application, routed telemetry through a collector, enriched it with custom dimensions, and landed it in a shared Observability Cloud org — then isolated <em>your</em> data with filters. That is the same pattern used in production: deploy apps → collect with OTel → tag for environment/team → analyze in Splunk.</p>
+          </div>
+        </div>
+
+        <p>When finished, continue to <a href="#cleanup">Step 8 — Cleanup</a> to tear down your deployment. Use the <a href="#diagnostics">Diagnostics</a> and <a href="#errors">Common errors</a> sections if anything needs troubleshooting.</p>
       </section>
 
       <section id="cleanup">
