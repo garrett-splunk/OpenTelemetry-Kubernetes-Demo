@@ -152,7 +152,7 @@ k3d-shw-455e-cluster-server-0   Ready    control-plane,master   5d    v1.33.4+k3
             <span class="code-block__file">terminal</span>
             <button type="button" class="btn-copy" data-copy="cmd-1-3">Copy</button>
           </div>
-          <pre><code id="cmd-1-3">echo $INSTANCE  # This is your instance name — use it to find your data later</code></pre>
+          <pre><code id="cmd-1-3">echo $INSTANCE  # Your instance name — same value as lab.id</code></pre>
         </div>
         <p><strong>Expected output:</strong></p>
         <div class="code-block success-line">
@@ -397,6 +397,20 @@ otel-collector-agent-28667         1/1     Running   0          111s
         </div>
         <h2>Find your data in O11y</h2>
         <p>Use the resource attributes from Step 3 to filter to your lab data in Splunk Observability Cloud.</p>
+
+        <div class="callout callout--tip">
+          <p class="callout__title">Need your instance ID?</p>
+          <div class="callout__body">
+            <p>Run <code>echo $INSTANCE</code> in your workshop terminal to print your instance name. This is the same value used for <code>lab.id</code> and for building filters like <code>environment:workshop-${INSTANCE}</code>.</p>
+            <div class="code-block">
+              <div class="code-block__header">
+                <span class="code-block__file">terminal</span>
+                <button type="button" class="btn-copy" data-copy="cmd-7-instance">Copy</button>
+              </div>
+              <pre><code id="cmd-7-instance">echo $INSTANCE</code></pre>
+            </div>
+          </div>
+        </div>
 
         <article class="ui-walkthrough">
           <h3>A. APM → Service Map → Filter</h3>
